@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script> 
+  <title>Virustotal</title>
+
+  :css
+    @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+    .box1 {
+      background: radial-gradient(at top right, #6dfc8d, #fff,  #fff);
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-size: 100% 100%;
+      animation: gradient 15s ease infinite;
+      height: 100vh;
+      width: 100vw;
+      opacity: 0.6;
+      position: absolute;
+      top: 0;
+      left: 0; 
+      z-index: -1;
+    }     
+
+    @media only screen and (max-width: 768px) {
+      .container {
+        padding: 16px;
+      }
+    }
+
+    .box2 {
+      background: radial-gradient(at top left, #33ceff, #fff, #fff);
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-size: 100% 100%;
+      animation: gradient 15s ease infinite;
+      height: 100vh;
+      width: 100vw;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -3;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      color: #2d2d2d;
+    }
+
+    .container {
+      width: 20rem;
+      margin-top: 10vh;
+      background-color: #fff;
+      padding: 32px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 16px 2px 	rgba(0, 0, 0, 0.1);
+    }
+
+    .container h1 {
+      font-size: 8vh;
+      font-weight: 700 !important;
+      margin-bottom: 32px;
+    }
+
+    .form-control {
+      margin-bottom: 8px !important;
+    }
+
+
+</head>
+
+<body>
+  <nav class="navbar navbar-expand navbar-light bg-light">
+    <a class="navbar-brand" href="/">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-braces" viewBox="0 0 16 16">
+        <path d="M2.114 8.063V7.9c1.005-.102 1.497-.615 1.497-1.6V4.503c0-1.094.39-1.538 1.354-1.538h.273V2h-.376C3.25 2 2.49 2.759 2.49 4.352v1.524c0 1.094-.376 1.456-1.49 1.456v1.299c1.114 0 1.49.362 1.49 1.456v1.524c0 1.593.759 2.352 2.372 2.352h.376v-.964h-.273c-.964 0-1.354-.444-1.354-1.538V9.663c0-.984-.492-1.497-1.497-1.6zM13.886 7.9v.163c-1.005.103-1.497.616-1.497 1.6v1.798c0 1.094-.39 1.538-1.354 1.538h-.273v.964h.376c1.613 0 2.372-.759 2.372-2.352v-1.524c0-1.094.376-1.456 1.49-1.456V7.332c-1.114 0-1.49-.362-1.49-1.456V4.352C13.51 2.759 12.75 2 11.138 2h-.376v.964h.273c.964 0 1.354.444 1.354 1.538V6.3c0 .984.492 1.497 1.497 1.6z" />
+      </svg>
+      VirusTotal
+    </a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav ml-auto d-flex flex-row justify-content-between align-items-center">
+        <li class="nav-item">
+          <a class="nav-link" href="/files">Files</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/urls">URLs</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/login">Sign in</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/register">Sign up</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Login -->
+  <div class="box1"></div>
+  <div class="box2"></div>
+  <div class="container">
+    <h1>Sign in</h1>
+    <form action="/login" onsubmit="submitForm(event)">
+      <div class="form-group">
+        <label for="userEmail">Email</label>
+        <input type="text" class="form-control" id="userEmail" name="userEmail" placeholder="Email">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+
+
+
+  :javascript
+    function fireSweetAlert() {
+      Swal.fire(
+          'Good job!',
+          'You have successfully signed in!',
+          'success'
+      ).then(function() {
+        window.location.replace("/");
+      });
+    }
+
+    function fireSweetAlertError(error) {
+      Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: error
+      })
+    }
+
+    function submitForm(event) {
+      event.preventDefault();
+      const url = "http://localhost:8080/api/v1/login";
+      const formData = new FormData(event.target);
+      const data = {};
+      formData.forEach((value, key) => (data[key] = value));
+      console.log(data);
+      localStorage.setItem('myEmail', data["userEmail"]);
+      fetch(url, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+      "Content-Type": "application/json",
+      },
+      })
+      .then((response) => response.json())
+      .then((data) => {
+      console.log("Success:", data);
+      console.log("Success:", data["AccessToken"]);
+      if (data.hasOwnProperty('statusMessage')) {
+        fireSweetAlertError(data['statusMessage']);
+      } else {
+        localStorage.setItem('mykey', data["AccessToken"]);
+        
+        fireSweetAlert();
+      }
+      
+      })
+      .catch((error) => {
+      console.error("Error:", error);
+      });
+    }
+</body>
+
+</html>

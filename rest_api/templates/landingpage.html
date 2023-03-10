@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <title>Virustotal</title>
+
+    :css
+      @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+      .container {
+        margin-top: 20vh;
+        margin-left: 0 !important;
+        flex-direction: row-reverse;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0 !important;
+      }
+
+      .container h1 {
+        font-size: 8rem;
+        font-weight: 700 !important;
+      }
+
+      @media only screen and (max-width: 768px) {
+        .container h1 {
+          font-size: 4rem;
+        }
+
+        .container {
+          margin-top: 10vh;
+          padding: 32px !important;
+        }
+
+        .col {
+          padding-right: 8px !important;
+          padding-left: 8px !important;
+        }
+
+        .upload {
+          padding: 32px  !important;
+        }
+
+        .list-unstyled a {
+          text-decoration: none !important;
+          font-size: small;
+        }
+      }
+
+      body {
+        font-family: 'Space Grotesk', sans-serif;
+        color: #2d2d2d;
+        overflow-x: hidden;
+      }
+
+      .container p {
+        font-weight: 300;
+        font-size: 2.5vh;
+        font-family: 'Lexend', sans-serif;
+      }
+
+      .container span {
+        color:#7b51dc;
+        text-transform: uppercase;
+        background-color:#e3dcf7;
+        padding: 8px;
+        border-radius: 8px;
+        font-family: 'Lexend', sans-serif;
+      }
+
+      .vertical {
+        writing-mode: vertical-lr;
+        text-orientation: mixed;
+        text-transform: uppercase;
+        transform: rotate(180deg);
+        opacity: 0.5;
+        font-weight: 700;
+        font-size: small;
+        font-family: 'Lexend', sans-serif;
+      }
+
+      .box1 {
+        background: radial-gradient(at top right, #6dfc8d, #fff,  #fff);
+        animation: gradient 15s ease infinite;
+        height: 100vh;
+        width: 100vw;
+        opacity:0.6;
+        position: absolute;
+        top: 0;
+        left: 0; 
+        z-index: -1;
+      }     
+  
+      .box2 {
+        background: radial-gradient(at top left, #33ceff, #fff, #fff);
+        animation: gradient 15s ease infinite;
+        height: 100vh;
+        width: 100vw;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -3;
+      }
+
+      .scroll {
+        width: 24px;
+        height: 24px;
+        animation: down 1.5s infinite;
+        -webkit-animation: down 1.5s infinite;
+        margin: auto;
+        margin-top: 16px;
+        margin-bottom: 10vh;
+      }
+      
+      .scroll::before {
+        content: "";
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        border-left: 2px solid #2d2d2d;
+        border-bottom: 2px solid #2d2d2d;
+        transform: rotate(-45deg);
+      }
+      
+      @keyframes down {
+        0% {
+          transform: translate(0);
+        }
+        20% {
+          transform: translateY(15px);
+        }
+        40% {
+          transform: translate(0);
+        }
+      }
+
+      .footer {
+        background-color: #f8f9fa;
+        justify-content: space-around;
+        padding-top: 32px;
+      }
+
+      .list-unstyled a {
+        text-decoration: none !important;
+      }
+
+      .upload {
+        padding-top: 10vh;
+        background-color: #fff;
+        padding: 64px;
+        box-shadow: 0px 0px 16px 2px 	rgba(0, 0, 0, 0.1);
+        border-radius: 32px;
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+      }
+
+      .upload-form { 
+        width: 22rem !important;
+        margin: auto;
+        padding: 16px;
+      }
+
+      input[type="file"] {
+        display: none;
+      }
+
+      .custom-file-upload {
+        border: 1px solid #ccc;
+        display: inline-block;
+        padding: 6px 12px;
+        cursor: pointer;
+        border-radius: 0.25rem;
+        margin: 0;
+        color: #767e86;
+      }
+
+      .upload-form p {
+        font-weight: 300;
+        font-size: 2rem;
+        font-family: 'Lexend', sans-serif;
+      }
+
+      .upload-form h2 {
+        font-size: 4rem;
+        font-weight: 700 !important;
+      }
+
+      .btn:focus,.btn:active {
+        outline: none !important;
+        box-shadow: none;
+      }
+
+      .btn {
+        margin-left: 16px;
+      }
+
+      .form-control {
+        border-radius: 0.25rem !important;
+      }
+
+
+  </head>
+  <body>
+    <div class="box1"></div>
+    <div class="box2"></div>
+    <!-- navbar with logo and few links -->
+    <nav class="navbar navbar-expand navbar-light bg-light">
+      <a class="navbar-brand" href="/">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-braces" viewBox="0 0 16 16">
+          <path d="M2.114 8.063V7.9c1.005-.102 1.497-.615 1.497-1.6V4.503c0-1.094.39-1.538 1.354-1.538h.273V2h-.376C3.25 2 2.49 2.759 2.49 4.352v1.524c0 1.094-.376 1.456-1.49 1.456v1.299c1.114 0 1.49.362 1.49 1.456v1.524c0 1.593.759 2.352 2.372 2.352h.376v-.964h-.273c-.964 0-1.354-.444-1.354-1.538V9.663c0-.984-.492-1.497-1.497-1.6zM13.886 7.9v.163c-1.005.103-1.497.616-1.497 1.6v1.798c0 1.094-.39 1.538-1.354 1.538h-.273v.964h.376c1.613 0 2.372-.759 2.372-2.352v-1.524c0-1.094.376-1.456 1.49-1.456V7.332c-1.114 0-1.49-.362-1.49-1.456V4.352C13.51 2.759 12.75 2 11.138 2h-.376v.964h.273c.964 0 1.354.444 1.354 1.538V6.3c0 .984.492 1.497 1.497 1.6z"/>
+        </svg>
+        VirusTotal
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbar-info-responsive">
+      </div>
+    </nav>
+
+    <!-- main content -->
+    <div class="container d-flex">
+      <div>
+        <h1>Virustotal file
+        <br>checker</h1>
+        <p>Analyse suspicious files, domains, IPs and URLs to detect malware and other breaches, share them with the security community.</p>
+        <span class="col">VIBE.D FRAMEWORK</span>
+      </div>
+      <div>
+        <p class="vertical d-none d-sm-block">Virus checker</p>
+      </div>
+    </div>
+
+    <div class="scroll"></div>
+    <!-- <button onclick="fireSweetAlert()" class="btn btn-secondary">Show sweet alert example</button> -->
+
+    <div class="upload">
+      <div class="row">
+        <div class="col upload-form">
+          <h2>Upload a file</h2>
+          <p>Check for malware and breaches</p>
+          
+          <div class="input-group mb-3">
+            <label for="file-upload" class="custom-file-upload" id="file-name">Choose file</label>
+            <input id="file-upload" type="file" class="form-control" name="file-upload">
+            <button onclick="addFile()" class="btn btn-primary" type="button" name="submit" id="button-addon2">Upload</button>
+          </div>
+        </div>
+        <div class="col upload-form">
+          <h2>Search or scan URL</h2>
+          <p>Check if your URL is genuine</p>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Enter an URL" aria-label="Search or scan URL" aria-describedby="button-addon2" id="url">
+            <button class="btn btn-primary" type="button" id="button-addon2" onclick="searchURL()">Search</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer d-flex">
+      <div class="row">
+        <div class="col">
+          <h5>Company</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">About</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Jobs</a></li>
+            <li><a href="#">Press</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h5>Community</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">Forum</a></li>
+            <li><a href="#">Twitter</a></li>
+            <li><a href="#">Facebook</a></li>
+            <li><a href="#">LinkedIn</a></li>
+            <li><a href="#">Instagram</a></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h5>Support</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">GDPR</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    :javascript
+
+      if (localStorage.getItem("mykey") === null) {
+        var navbar = ``
+        navbar += `<ul class="navbar-nav ml-auto d-flex flex-row justify-content-between align-items-center">`
+        navbar += `<li class="nav-item"><a class="nav-link" href="/files">Files</a></li><li class="nav-item"><a class="nav-link" href="/urls">URLs</a></li><li class="nav-item"><a class="nav-link" href="/login">Sign in</a></li><li class="nav-item"><a class="nav-link" href="/register">Sign up</a></li>`
+        navbar += `</ul>`
+        document.getElementById("navbar-info-responsive").innerHTML = navbar;
+
+      } else {
+        var navbar = ``
+        navbar += `<ul class="navbar-nav ml-auto d-flex flex-row justify-content-between align-items-center">`
+        navbar += `<li class="nav-item"><a class="nav-link" href="/files">Files</a></li><li class="nav-item"><a class="nav-link" href="/urls">URLs</a></li><li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li><li class="nav-item"><button class="btn btn-danger" type="button" id="button-addon2" onclick="logout()">Logout</button></li>`
+        navbar += `</ul>`
+        document.getElementById("navbar-info-responsive").innerHTML = navbar;
+      }
+
+      function logout() {
+        Swal.fire({
+          icon: 'info',
+          title: 'Info',
+          text: "You are about to log out",
+        }).then(function() {
+          localStorage.removeItem("mykey");
+          localStorage.removeItem("myEmail");
+          window.location.href = "/";
+        });
+      }
+
+      function fireSweetAlertError(error) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Info',
+            text: error,
+            footer: '<a href="/urls">Mark this URL as malicious</a>'
+        })
+      }
+
+      function fireSweetAlertError2(error) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Info',
+            text: error,
+        })
+      }
+
+      function fireSweetAlert(message) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Malicious URL found',
+            text: message
+        })
+      }
+
+      function searchURL(event) {
+        var url = document.getElementById("url").value;
+        if (url == "") {
+          fireSweetAlertError2("Please enter an URL");
+        } else {
+        var address = "http://127.0.0.1:8080/api/v1/url_info?urlAddress="
+        var urlAddress = address.concat(url);
+        fetch(urlAddress)
+        .then(res => res.json())
+        .then(out => {
+          if (out.hasOwnProperty('statusMessage')) {
+            
+            fireSweetAlertError("URL not found in our database");
+            
+          } else {
+            var message = out["addr"] + " was found to be dangerous by user " + out["userId"];
+            fireSweetAlert(message);
+          }
+        })
+        .catch(err => { throw err });
+        }
+      }
+
+      const listner = document.getElementById("file-upload");
+      listner.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        document.getElementById("file-name").textContent = file.name;
+      });
+
+      function addFile() {
+        console.log("sending file")
+        if (localStorage.getItem("mykey") === null || localStorage.getItem("myEmail") === null) {
+          Swal.fire({
+            icon: 'info',
+            title: 'Info',
+            text: "You have to sign in or sign up in order to add files",
+            footer: '<a href="/login">Go to sign in page</a>'
+          })
+        } else {
+          const formData = new FormData();
+          var requestData = {}
+          requestData = {...requestData,
+            "userEmail": localStorage.getItem("myEmail")
+          }
+          requestData = {
+            "userEmail": localStorage.getItem("myEmail")
+          }
+          const file = document.getElementById("file-upload").files[0]
+
+          
+          var reader = new FileReader();
+          var fileByteArray = [];
+          reader.readAsArrayBuffer(file);
+          reader.onloadend = function (evt) {
+            if (evt.target.readyState == FileReader.DONE) {
+              var arrayBuffer = evt.target.result,
+                array = new Uint8Array(arrayBuffer);
+              for (var i = 0; i < array.length; i++) {
+                fileByteArray.push(array[i]);
+              }
+
+              var ceva = JSON.stringify({"binData": fileByteArray})
+              requestData = {
+                ...requestData, "binData": fileByteArray
+              }
+      
+              requestData = {
+                ...requestData, "fileName": file.name
+              }
+
+              const url = "http://127.0.0.1:8080/api/v1/add_file"
+              fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(requestData),
+                headers: {
+                  'Content-Type': 'application/json',
+                  'AccessToken': localStorage.getItem("mykey")
+                }
+              })
+              .then(res => res.json())
+              .then(out => {
+                console.log(out)
+                var output = String(out).split("{")[0];
+
+                if (String(out).split("{")[1] == undefined) {
+                  Swal.fire({
+                    icon: 'info',
+                    title: 'Info',
+                    text: output,
+                    footer: '<a href="/files">Go to files page</a>'
+                  })
+                } else {
+                  var string = "{" + out.split("{")[1]
+                  var obj = JSON.parse(string);
+                  Swal.fire({
+                    icon: 'info',
+                    title: 'Info',
+                    text: output + 'Your file was added by ' + obj["userId"] + ' with hash ' + obj["digest"],
+                    footer: '<a href="/files">Go to files page</a>'
+                  })
+                }
+              })
+              .catch(err => { throw err });
+            }
+          }
+        }
+      }
+  </body>
+
+  <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+
+  
+
+
+</html>
